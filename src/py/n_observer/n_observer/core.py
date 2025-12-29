@@ -51,11 +51,17 @@ class RwLock(Generic[T]):
         async with self._wlock:
             reading = True
             while reading:
-                async with self._rlock:
-                    reading = self._readers > 0
+                await self._rlock.acquire()
+                reading = self._readers > 0
                 if reading:
                     async with self._cond:
+                        # Release read lock so readers can finish
+                        self._rlock.release()
+                        # Wait for readers to finish
                         await self._cond.wait()
+                else:
+                    self._rlock.release()
+                    break
             yield RwLock.Writer(self)
             # async with self._cond:
             #     self._cond.notify_all()
