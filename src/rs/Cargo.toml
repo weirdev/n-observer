@@ -1,5 +1,6 @@
 [workspace]
 members = [
     "n-observer",
+    "n-observer-cffi-impl",
 ]
 resolver = "3"
