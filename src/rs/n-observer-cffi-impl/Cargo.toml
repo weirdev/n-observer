@@ -1,0 +1,24 @@
+[package]
+name = "observer_cffi_helpers"
+version = "0.1.0"
+edition = "2024"
+
+[lib]
+name = "observer_cffi_helpers"
+crate-type = ["rlib"]
+
+[dependencies]
+n-observer = { version = "0.1.0", path = "../n-observer" }
+async-cffi = "0.1.0"
+futures = "0.3.31"
+
+[dependencies.tokio]
+version = "1.41.1"
+features = ["macros", "rt-multi-thread", "sync"]
+
+[dev-dependencies]
+serial_test = "3.2.0"
+
+[build-dependencies]
+n-observer = { version = "0.1.0", path = "../n-observer" }
+async-cffi-codegen = "0.1.0"
