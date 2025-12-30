@@ -1,9 +1,9 @@
-from typing import Any
+from typing import Any, Optional
 import asyncio
 import typing
 import pytest
 
-from n_observer.n_observer import Observer, Publisher, RwLock
+from n_observer.n_observer import IInnerObserverReceiver, Observer, Publisher, RwLock
 
 
 @pytest.mark.asyncio
@@ -199,3 +199,31 @@ async def test_transform_raises_does_not_update(caplog: pytest.LogCaptureFixture
     # notify a valid value -> observer updates
     await publisher.notify(3)
     assert await observer.get() == 6
+
+
+@pytest.mark.asyncio
+async def test_notify_parallel_observers() -> None:
+    publisher = Publisher()
+    fast_event = asyncio.Event()
+    slow_event = asyncio.Event()
+
+    class SlowObserver(IInnerObserverReceiver):
+        async def update(self, data: list[Optional[object]]) -> None:
+            await asyncio.sleep(0.2)
+            slow_event.set()
+
+    class FastObserver(IInnerObserverReceiver):
+        async def update(self, data: list[Optional[object]]) -> None:
+            fast_event.set()
+
+    await publisher.add_observer(SlowObserver(), 0)
+    await publisher.add_observer(FastObserver(), 0)
+
+    notify_task = asyncio.create_task(publisher.notify("value"))
+
+    await asyncio.wait_for(fast_event.wait(), timeout=0.05)
+    assert not slow_event.is_set()
+
+    await notify_task
+    assert fast_event.is_set()
+    assert slow_event.is_set()
