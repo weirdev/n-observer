@@ -18,11 +18,13 @@ class RwLock(Generic[T]):
         async with self._wlock:
             async with self._rcond:
                 self._readers += 1
-        yield self._value
-        async with self._rcond:
-            self._readers -= 1
-            if self._readers == 0:
-                self._rcond.notify()
+        try:
+            yield self._value
+        finally:
+            async with self._rcond:
+                self._readers -= 1
+                if self._readers == 0:
+                    self._rcond.notify()
 
     class Writer(Generic[TI]):
         def __init__(self, rwlock: "RwLock[TI]"):
