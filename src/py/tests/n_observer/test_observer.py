@@ -224,3 +224,25 @@ async def test_notify_parallel_observers() -> None:
     await notify_task
     assert fast_event.is_set()
     assert slow_event.is_set()
+
+
+@pytest.mark.asyncio
+async def test_notify_parallel_observers_with_exception() -> None:
+    publisher = Publisher()
+    slow_event = asyncio.Event()
+
+    class SlowObserver(IInnerObserverReceiver):
+        async def update(self, data: list[Optional[object]]) -> None:
+            slow_event.set()
+
+    class FastObserver(IInnerObserverReceiver):
+        async def update(self, data: list[Optional[object]]) -> None:
+            raise RuntimeError("fast-failure")
+
+    await publisher.add_observer(SlowObserver(), 0)
+    await publisher.add_observer(FastObserver(), 0)
+
+    with pytest.raises(RuntimeError, match="fast-failure"):
+        await publisher.notify("value")
+
+    assert slow_event.is_set()

@@ -260,4 +260,7 @@ class Publisher(IPublisher):
                 inputs[i] = value
                 updates.append(observer.update(inputs))
             if updates:
-                await asyncio.gather(*updates)
+                results = await asyncio.gather(*updates, return_exceptions=True)
+                for result in results:
+                    if isinstance(result, Exception):
+                        raise result
