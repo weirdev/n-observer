@@ -54,8 +54,10 @@ where
 
     // NOTE: `last_inputs` must be updated before calling this
     async fn update_direct(&self, data: AnyArc) {
-        *self.current.write().await = Some(data.clone().downcast::<T>().unwrap());
-        self.publisher.notify(data).await;
+        if let Ok(casted) = data.downcast::<T>() {
+            *self.current.write().await = Some(casted.clone());
+            self.publisher.notify(casted).await;
+        }
     }
 
     async fn update_with_transform(&self, data: Vec<Option<AnyArc>>) {
@@ -160,7 +162,15 @@ where
         let inner = Arc::new(InnerObserverImpl {
             current: RwLock::new(None),
             publisher: CachedPublisher::new(None),
-            transform: Box::new(|data: Vec<AnyArc>| Ok(data[0].clone().downcast::<T>().unwrap())),
+            transform: Box::new(|data: Vec<AnyArc>| {
+                if let Some(input) = data.into_iter().next() {
+                    input
+                        .downcast::<T>()
+                        .map_err(|_| ObserverError::TransformError)
+                } else {
+                    Err(ObserverError::TransformError)
+                }
+            }),
             last_inputs: RwLock::new(vec![None]),
             parent_publisher_refs: RwLock::new(Vec::new()),
         });
