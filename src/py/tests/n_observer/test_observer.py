@@ -177,7 +177,7 @@ async def test_rwlock() -> None:
 
 
 @pytest.mark.asyncio
-async def test_transform_raises_does_not_update() -> None:
+async def test_transform_raises_does_not_update(caplog: pytest.LogCaptureFixture) -> None:
     def transform(x: object) -> int:
         val = typing.cast(int, x)
         if val == 2:
@@ -188,7 +188,12 @@ async def test_transform_raises_does_not_update() -> None:
     observer = await Observer[int].new_with_transform(publisher, transform)
 
     # notify a value that causes the transform to raise -> no update
-    await publisher.notify(2)
+    with caplog.at_level("ERROR"):
+        with pytest.raises(ValueError, match="bad-transform"):
+            await publisher.notify(2)
+    assert any(
+        "Observer transform failed." in record.message for record in caplog.records
+    )
     assert await observer.get() is None
 
     # notify a valid value -> observer updates

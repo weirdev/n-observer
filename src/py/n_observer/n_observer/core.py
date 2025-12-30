@@ -2,10 +2,15 @@ from contextlib import asynccontextmanager
 from asyncio import Lock, Condition
 from typing import Callable, AsyncGenerator, Optional, TypeVar, Generic
 from typing_extensions import override
+import logging
 import typing
 
 T = TypeVar("T")
 TI = TypeVar("TI")
+
+
+class ObserverError(Exception):
+    """Signals an expected failure in an observer transform that should skip updates."""
 
 
 class RwLock(Generic[T]):
@@ -117,6 +122,12 @@ class Observer(IObservable[T], Generic[T]):
     async def new_with_transform(
         cls, publisher: "IPublisher", transform: Callable[[object], T]
     ) -> "Observer[T]":
+        """
+        Create a new observer that applies a transform to incoming values.
+
+        The transform may raise ObserverError to explicitly skip an update.
+        Other exceptions are logged and re-raised.
+        """
         self_publisher: Publisher = Publisher()
         current: RwLock[Optional[T]] = RwLock(None)
         last_inputs: RwLock[list[Optional[object]]] = RwLock([None])
@@ -225,8 +236,13 @@ class InnerObserverImpl(IInnerObserverReceiver, Generic[T]):
         try:
             transformed_value = self.transform(inputs)
             await self.update_direct(transformed_value)
+        except ObserverError:
+            logging.getLogger(__name__).exception(
+                "Observer transform skipped due to ObserverError."
+            )
         except Exception:
-            pass
+            logging.getLogger(__name__).exception("Observer transform failed.")
+            raise
 
 
 class Publisher(IPublisher):
