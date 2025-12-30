@@ -8,25 +8,21 @@ TI = TypeVar("TI")
 
 class RwLock(Generic[T]):
     def __init__(self, value: T):
-        self._rlock = Lock()
+        self._rcond = Condition()
         self._wlock = Lock()
-        self._cond = Condition(self._rlock)
         self._readers = 0
         self._value = value
 
     @asynccontextmanager
     async def read(self) -> AsyncGenerator["T", None]:
         async with self._wlock:
-            # while self._rlock.locked():
-            #     async with self._cond:
-            #         await self._cond.wait()
-            async with self._cond:
+            async with self._rcond:
                 self._readers += 1
         yield self._value
-        async with self._cond:
+        async with self._rcond:
             self._readers -= 1
             if self._readers == 0:
-                self._cond.notify()
+                self._rcond.notify()
 
     class Writer(Generic[TI]):
         def __init__(self, rwlock: "RwLock[TI]"):
@@ -46,9 +42,7 @@ class RwLock(Generic[T]):
     @asynccontextmanager
     async def write(self) -> AsyncGenerator["RwLock[T].Writer[T]", None]:
         async with self._wlock:
-            async with self._cond:
+            async with self._rcond:
                 while self._readers > 0:
-                    await self._cond.wait()
+                    await self._rcond.wait()
             yield RwLock.Writer(self)
-            # async with self._cond:
-            #     self._cond.notify_all()
