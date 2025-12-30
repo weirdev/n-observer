@@ -7,6 +7,19 @@ TI = TypeVar("TI")
 
 
 class RwLock(Generic[T]):
+    """Async reader-writer lock around a single shared value.
+
+    The value returned by :meth:`read` is the underlying reference; callers must
+    treat it as immutable unless they hold the write lock.
+
+    Example with a mutable value (replace rather than mutate in-place):
+
+    >>> async with lock.read() as items:
+    ...     snapshot = items
+    >>> async with lock.write() as writer:
+    ...     writer.set_value(snapshot + ["new-item"])
+    """
+
     def __init__(self, value: T):
         self._rcond = Condition()
         self._wlock = Lock()
@@ -15,6 +28,11 @@ class RwLock(Generic[T]):
 
     @asynccontextmanager
     async def read(self) -> AsyncGenerator["T", None]:
+        """Acquire a read lock and yield the underlying value.
+
+        The yielded object is the shared reference; treat it as immutable unless
+        you currently hold the write lock.
+        """
         async with self._wlock:
             async with self._rcond:
                 self._readers += 1
