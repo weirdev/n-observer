@@ -59,32 +59,28 @@ where
     }
 
     async fn update_with_transform(&self, data: Vec<Option<AnyArc>>) {
-        data.into_iter()
-            .zip(self.last_inputs.write().await.iter_mut())
-            // None input implies that publisher didn't notify with an update
-            .filter(|(input, _)| input.is_some())
-            .for_each(|(input, last_input)| {
-                *last_input = input;
-            });
-        let inputs = self
-            .last_inputs
-            .read()
-            .await
-            .iter()
-            .try_fold(Vec::new(), |mut acc, input| {
+        let inputs = {
+            let mut last_inputs = self.last_inputs.write().await;
+            data.into_iter()
+                .zip(last_inputs.iter_mut())
+                // None input implies that publisher didn't notify with an update
+                .filter(|(input, _)| input.is_some())
+                .for_each(|(input, last_input)| {
+                    *last_input = input;
+                });
+            let mut inputs = Vec::with_capacity(last_inputs.len());
+            for input in last_inputs.iter() {
                 if let Some(input) = input {
-                    acc.push(input.clone());
-                    Ok(acc)
+                    inputs.push(input.clone());
                 } else {
-                    Err(())
+                    return;
                 }
-            });
-        if let Ok(inputs) = inputs {
-            if let Ok(transformed_data) = (self.transform)(inputs) {
-                self.update_direct(transformed_data).await;
             }
+            inputs
+        };
+        if let Ok(transformed_data) = (self.transform)(inputs) {
+            self.update_direct(transformed_data).await;
         }
-        // If any input was None, we do nothing
     }
 }
 
