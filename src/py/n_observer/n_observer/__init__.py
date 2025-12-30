@@ -1,12 +1,7 @@
 """Observer pattern implementation with async support."""
 
-from .core import (
-    RwLock,
-    IPublisher,
-    IInnerObserverReceiver,
-    Observer,
-    Publisher,
-)
+from .core import IPublisher, IInnerObserverReceiver, Observer, Publisher
+from .rwlock import RwLock
 
 __all__ = [
     "RwLock",
