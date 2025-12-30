@@ -201,10 +201,11 @@ async def test_notify_parallel_observers() -> None:
     publisher = Publisher()
     fast_event = asyncio.Event()
     slow_event = asyncio.Event()
+    allow_slow_event = asyncio.Event()
 
     class SlowObserver(IInnerObserverReceiver):
         async def update(self, data: list[Optional[object]]) -> None:
-            await asyncio.sleep(0.2)
+            await allow_slow_event.wait()
             slow_event.set()
 
     class FastObserver(IInnerObserverReceiver):
@@ -216,9 +217,10 @@ async def test_notify_parallel_observers() -> None:
 
     notify_task = asyncio.create_task(publisher.notify("value"))
 
-    await asyncio.wait_for(fast_event.wait(), timeout=0.05)
+    await asyncio.wait_for(fast_event.wait(), timeout=0.5)
     assert not slow_event.is_set()
 
+    allow_slow_event.set()
     await notify_task
     assert fast_event.is_set()
     assert slow_event.is_set()
