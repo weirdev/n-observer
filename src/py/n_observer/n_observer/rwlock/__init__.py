@@ -10,7 +10,7 @@ class RwLock(Generic[T]):
     def __init__(self, value: T):
         self._rlock = Lock()
         self._wlock = Lock()
-        self._cond = Condition()
+        self._cond = Condition(self._rlock)
         self._readers = 0
         self._value = value
 
@@ -20,14 +20,13 @@ class RwLock(Generic[T]):
             # while self._rlock.locked():
             #     async with self._cond:
             #         await self._cond.wait()
-            async with self._rlock:
+            async with self._cond:
                 self._readers += 1
         yield self._value
-        async with self._rlock:
+        async with self._cond:
             self._readers -= 1
             if self._readers == 0:
-                async with self._cond:
-                    self._cond.notify()
+                self._cond.notify()
 
     class Writer(Generic[TI]):
         def __init__(self, rwlock: "RwLock[TI]"):
@@ -47,19 +46,9 @@ class RwLock(Generic[T]):
     @asynccontextmanager
     async def write(self) -> AsyncGenerator["RwLock[T].Writer[T]", None]:
         async with self._wlock:
-            reading = True
-            while reading:
-                await self._rlock.acquire()
-                reading = self._readers > 0
-                if reading:
-                    async with self._cond:
-                        # Release read lock so readers can finish
-                        self._rlock.release()
-                        # Wait for readers to finish
-                        await self._cond.wait()
-                else:
-                    self._rlock.release()
-                    break
+            async with self._cond:
+                while self._readers > 0:
+                    await self._cond.wait()
             yield RwLock.Writer(self)
             # async with self._cond:
             #     self._cond.notify_all()
