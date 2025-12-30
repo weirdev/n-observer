@@ -18,6 +18,11 @@ class RwLock(Generic[T]):
     ...     snapshot = items
     >>> async with lock.write() as writer:
     ...     writer.set_value(snapshot + ["new-item"])
+
+    Note that once a writer acquires the write lock, no new readers can acquire
+    the read lock until the writer releases the write lock.
+    However, in highly contended scenarios, it is theoretically possible for readers
+    to starve writers indefinitely. RwLock has the same fairness properties as asyncio.Lock.
     """
 
     def __init__(self, value: T):
