@@ -1,4 +1,5 @@
 from contextlib import asynccontextmanager
+import asyncio
 from asyncio import Lock, Condition
 from typing import Callable, AsyncGenerator, Optional, TypeVar, Generic
 from typing_extensions import override
@@ -253,8 +254,10 @@ class Publisher(IPublisher):
             writer.set_value(value)
 
         async with self._observers.read() as rvalue:
-            # TODO: Parallelize
+            updates = []
             for i, observer in rvalue:
                 inputs: list[Optional[object]] = [None] * (i + 1)
                 inputs[i] = value
-                await observer.update(inputs)
+                updates.append(observer.update(inputs))
+            if updates:
+                await asyncio.gather(*updates)
