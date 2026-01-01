@@ -19,7 +19,11 @@ def main():
     run(["cargo", "test"], cwd=RUST_DIR)
 
     env = os.environ.copy()
-    env["PYTHONPATH"] = str(PYTHON_DIR)
+    python_paths = [
+        str(PYTHON_DIR),
+        str(Path(PYTHON_DIR) / "n_observer" / "src"),
+    ]
+    env["PYTHONPATH"] = os.pathsep.join(python_paths)
     # Run python unit and integration tests
     run(
         ["python", "-m", "pytest", "-v"],

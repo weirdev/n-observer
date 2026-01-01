@@ -3,7 +3,7 @@ import asyncio
 import typing
 import pytest
 
-from n_observer.n_observer import IInnerObserverReceiver, Observer, Publisher
+from n_observer import IInnerObserverReceiver, Observer, Publisher
 
 
 @pytest.mark.asyncio

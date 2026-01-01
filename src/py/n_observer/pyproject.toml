@@ -1,0 +1,36 @@
+[build-system]
+requires = ["setuptools>=61.0.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "n-observer"
+version = "0.1.0"
+description = "An async/await observer pattern implementation. Supports observing multiple publishers from a single observer."
+readme = "README.md"
+requires-python = ">=3.5"
+authors = [
+  {name = "N-Observer Contributors"}
+]
+classifiers = [
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3 :: Only",
+  "Operating System :: OS Independent",
+]
+dependencies = [
+  "async_rwlock",
+  "typing_extensions",
+]
+
+[project.optional-dependencies]
+test = [
+  "pytest",
+  "pytest-asyncio",
+]
+
+[tool.setuptools]
+package-dir = {"" = "src"}
+
+[tool.setuptools.packages.find]
+where = ["src"]
+include = ["n_observer*"]
+exclude = ["observer_cffi*"]

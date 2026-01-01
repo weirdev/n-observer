@@ -2,3 +2,4 @@ pytest
 pytest-asyncio
 black
 typing_extensions
+async_rwlock
