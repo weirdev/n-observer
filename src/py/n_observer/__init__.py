@@ -1,13 +1,10 @@
-"""Observer pattern implementation with async support.
-
-RwLock's ``read()`` yields the underlying shared reference; treat it as
-immutable unless you currently hold the write lock.
+"""
+Observer pattern implementation with async support.
 """
 
-from .n_observer import Observer, Publisher, RwLock
+from .n_observer import Observer, Publisher
 
 __all__ = [
     "Observer",
     "Publisher",
-    "RwLock",
 ]

@@ -5,10 +5,8 @@ immutable unless you currently hold the write lock.
 """
 
 from .core import IPublisher, IInnerObserverReceiver, Observer, Publisher
-from .rwlock import RwLock
 
 __all__ = [
-    "RwLock",
     "IPublisher",
     "IInnerObserverReceiver",
     "Observer",

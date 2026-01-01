@@ -4,7 +4,7 @@ from typing_extensions import override
 import logging
 import typing
 
-from .rwlock import RwLock
+from async_rwlock import RwLock
 
 T = TypeVar("T")
 
