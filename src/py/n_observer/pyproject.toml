@@ -7,7 +7,7 @@ name = "n-observer"
 version = "0.1.0"
 description = "An async/await observer pattern implementation. Supports observing multiple publishers from a single observer."
 readme = "README.md"
-requires-python = ">=3.5"
+requires-python = ">=3.10"
 authors = [
   {name = "N-Observer Contributors"}
 ]
