@@ -15,7 +15,7 @@ crate-type = ["cdylib", "rlib"]
 
 [dependencies]
 n-observer = { version = "0.1.0", path = "../n-observer"}
-n-observer-cffi-impl = { path = "../n-observer-cffi-impl" }
+n-observer-cffi-impl = { version = "0.1.0", path = "../n-observer-cffi-impl" }
 async-cffi = "0.1.0"
 futures = "0.3.31"
 
