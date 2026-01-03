@@ -2,6 +2,12 @@
 name = "n-observer-cffi-impl"
 version = "0.1.0"
 edition = "2024"
+license = "MIT OR Apache-2.0"
+description = "CFFI logic without the C declarations for the n-observer rust library."
+repository = "https://github.com/weirdev/n-observer"
+readme = "README.md"
+keywords = ["observer", "pubsub", "ffi", "cdylib"]
+categories = ["development-tools::ffi"]
 
 [lib]
 name = "n_observer_cffi_impl"
