@@ -1,0 +1,21 @@
+[package]
+name = "n-observer-cffi"
+version = "0.1.0"
+edition = "2024"
+
+[lib]
+name = "n_observer_cffi"
+crate-type = ["cdylib", "rlib"]
+
+[dependencies]
+n-observer = { version = "0.1.0", path = "../n-observer"}
+n-observer-cffi-impl = { path = "../n-observer-cffi-impl" }
+async-cffi = "0.1.0"
+futures = "0.3.31"
+
+[dependencies.tokio]
+version = "1.41.1"
+features = ["macros", "rt-multi-thread", "sync"]
+
+[dev-dependencies]
+serial_test = "3.2.0"

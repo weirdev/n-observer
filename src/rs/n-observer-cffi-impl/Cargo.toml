@@ -1,10 +1,10 @@
 [package]
-name = "observer_cffi_helpers"
+name = "n-observer-cffi-impl"
 version = "0.1.0"
 edition = "2024"
 
 [lib]
-name = "observer_cffi_helpers"
+name = "n_observer_cffi_impl"
 crate-type = ["rlib"]
 
 [dependencies]

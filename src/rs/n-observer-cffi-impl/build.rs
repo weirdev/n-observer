@@ -9,11 +9,11 @@ fn main() -> Result<()> {
         &get_rs_target_path("ior_cffi_traits.rs"),
         &HashMap::new(),
     )?;
-    generate_py(
-        &ior_trait_schema,
-        &get_py_target_path("ior_cffi_traits.py"),
-        &HashMap::new(),
-    )?;
+    // generate_py(
+    //     &ior_trait_schema,
+    //     &get_py_target_path("ior_cffi_traits.py"),
+    //     &HashMap::new(),
+    // )?;
 
     let publisher_trait_schema = n_observer::Publisher_schema();
     generate_rs(
@@ -21,11 +21,11 @@ fn main() -> Result<()> {
         &get_rs_target_path("publisher_cffi_traits.rs"),
         &HashMap::new(),
     )?;
-    generate_py(
-        &publisher_trait_schema,
-        &get_py_target_path("publisher_cffi_traits.py"),
-        &HashMap::new(),
-    )?;
+    // generate_py(
+    //     &publisher_trait_schema,
+    //     &get_py_target_path("publisher_cffi_traits.py"),
+    //     &HashMap::new(),
+    // )?;
 
     let observable_trait_schema = n_observer::Observable_schema();
     let ior_super_schema = n_observer::InnerObserverReceiver_schema();
@@ -39,11 +39,11 @@ fn main() -> Result<()> {
         &get_rs_target_path("observable_cffi_traits.rs"),
         &observable_supertraits,
     )?;
-    generate_py(
-        &observable_trait_schema,
-        &get_py_target_path("observable_cffi_traits.py"),
-        &observable_supertraits,
-    )?;
+    // generate_py(
+    //     &observable_trait_schema,
+    //     &get_py_target_path("observable_cffi_traits.py"),
+    //     &observable_supertraits,
+    // )?;
 
     Ok(())
 }

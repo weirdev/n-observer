@@ -325,6 +325,30 @@ dependencies = [
 ]
 
 [[package]]
+name = "n-observer-cffi"
+version = "0.1.0"
+dependencies = [
+ "async-cffi",
+ "futures",
+ "n-observer",
+ "n-observer-cffi-impl",
+ "serial_test",
+ "tokio",
+]
+
+[[package]]
+name = "n-observer-cffi-impl"
+version = "0.1.0"
+dependencies = [
+ "async-cffi",
+ "async-cffi-codegen",
+ "futures",
+ "n-observer",
+ "serial_test",
+ "tokio",
+]
+
+[[package]]
 name = "num-modular"
 version = "0.6.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -337,18 +361,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "537b596b97c40fcf8056d153049eb22f481c17ebce72a513ec9286e4986d1bb6"
 dependencies = [
  "num-modular",
-]
-
-[[package]]
-name = "observer_cffi_helpers"
-version = "0.1.0"
-dependencies = [
- "async-cffi",
- "async-cffi-codegen",
- "futures",
- "n-observer",
- "serial_test",
- "tokio",
 ]
 
 [[package]]
