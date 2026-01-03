@@ -33,4 +33,3 @@ package-dir = {"" = "src"}
 [tool.setuptools.packages.find]
 where = ["src"]
 include = ["n_observer*"]
-exclude = ["observer_cffi*"]
