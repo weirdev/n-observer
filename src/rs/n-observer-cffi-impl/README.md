@@ -29,11 +29,18 @@ pub struct CffiPublisher {
 ```
 
 ## Regenerating and validating generated bindings
-The build script regenerates both the Rust and Python CFFI bindings. Run
-`cargo build -p observer_cffi_helpers` from `src/rust` to refresh the generated
-files (including `src/py/centconf/observer_cffi/ior_cffi_traits.py`).
+This crate's build script regenerates the Rust CFFI trait files in
+`src/rs/n-observer-cffi-impl/src/`.
 
-For a quick equivalence check against the checked-in Python output without
-manually diffing, execute `scripts/compare_async_cffi_output.sh` from the repo
-root. The script snapshots the current file, rebuilds the bindings, and shows a
-diff so you can confirm the regenerated output matches what is committed.
+From the Rust workspace root, run:
+
+`cargo build -p n-observer-cffi-impl`
+
+from `src/rs`.
+
+To validate the checked-in generated files, diff the generated trait sources
+after the build:
+
+`git diff -- src/rs/n-observer-cffi-impl/src/*_cffi_traits.rs`
+
+If the diff is empty, the generated output in the repository is up to date.
