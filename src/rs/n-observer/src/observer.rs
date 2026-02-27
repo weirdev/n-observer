@@ -218,7 +218,7 @@ where
                 if let Some(input) = inputs.into_iter().next() {
                     transform(input)
                 } else {
-                    panic!("Invalid input supplied to transform function");
+                    Err(ObserverError::TransformError)
                 }
             }),
             last_inputs: RwLock::new(vec![None]),
